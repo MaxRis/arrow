@@ -657,6 +657,9 @@ StreamWriter::StreamWriter() {
   impl_.reset(new StreamWriterImpl());
 }
 
+StreamWriter::~StreamWriter() {
+}
+
 Status StreamWriter::WriteRecordBatch(const RecordBatch& batch) {
   return impl_->WriteRecordBatch(batch);
 }
@@ -715,6 +718,9 @@ class FileWriter::FileWriterImpl : public StreamWriter::StreamWriterImpl {
 
 FileWriter::FileWriter() {
   impl_.reset(new FileWriterImpl());
+}
+
+FileWriter::~FileWriter() {
 }
 
 Status FileWriter::Open(io::OutputStream* sink, const std::shared_ptr<Schema>& schema,

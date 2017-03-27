@@ -41,14 +41,34 @@ static bool FileExists(const std::string& path) {
   return std::ifstream(path.c_str()).good();
 }
 
-static bool FileIsClosed(int fd) {
-#ifdef _MSC_VER
-  // Close file a second time, this should set errno to EBADF
-  close(fd);
-#else
-  if (-1 != fcntl(fd, F_GETFD)) { return false; }
+#if defined(_MSC_VER)
+void customInvalidParameterHandler(const wchar_t* expression,
+	const wchar_t* function,
+	const wchar_t* file,
+	unsigned int line,
+	uintptr_t pReserved)
+{
+	wprintf(L"Invalid parameter detected in function %s."
+		L" File: %s Line: %d\n", function, file, line);
+	wprintf(L"Expression: %s\n", expression);
+}
 #endif
-  return errno == EBADF;
+
+static bool FileIsClosed(int fd) {
+#if defined(_MSC_VER)
+    // Disables default behavior on wrong params which causes the application to crash
+    // https://msdn.microsoft.com/en-us/library/ksazx244.aspx
+    _set_invalid_parameter_handler(customInvalidParameterHandler);
+
+    // Disable the message box for assertions.
+    _CrtSetReportMode(_CRT_ASSERT, 0);
+
+    int ret = static_cast<int>(_close(fd));
+    return (ret == -1);
+#else
+    if (-1 != fcntl(fd, F_GETFD)) { return false; }
+    return errno == EBADF;
+#endif
 }
 
 class FileTestFixture : public ::testing::Test {
