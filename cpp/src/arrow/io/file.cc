@@ -73,6 +73,7 @@
 // C++ standard library
 
 #include <algorithm>
+#include <codecvt>
 #include <cstring>
 #include <iostream>
 #include <limits>
@@ -153,27 +154,17 @@ static inline int64_t lseek64_compat(int fd, int64_t pos, int whence) {
 }
 
 #if defined(_MSC_VER)
-static inline Status Utf8ToUtf16(const std::string& input, std::wstring &result) {
-    if (input.empty()) {
-        result = std::wstring();
-        return Status::OK();
-    }
+static inline Status ConvertToUtf16(const std::string& input, std::wstring* result) {
+  if (result == nullptr) { return Status::Invalid("Pointer to result is not valid"); }
 
-    size_t charsNeeded = ::MultiByteToWideChar(CP_UTF8, 0,
-        input.data(), (int)input.size(), NULL, 0);
-    if (charsNeeded == 0) {
-        return Status::IOError("Failed converting UTF-8 string to UTF-16");
-    }
-
-    std::vector<wchar_t> buffer(charsNeeded);
-    size_t charsConverted = ::MultiByteToWideChar(CP_UTF8, 0,
-        input.data(), static_cast<int>(input.size()), &buffer[0], static_cast<int>(buffer.size()));
-    if (charsConverted == 0) {
-        return Status::IOError("Failed converting UTF-8 string to UTF-16");
-    }
-
-    result = std::wstring(&buffer[0], charsConverted);
+  if (input.empty()) {
+    *result = std::wstring();
     return Status::OK();
+  }
+
+  std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> utf16_converter;
+  *result = utf16_converter.from_bytes(input);
+  return Status::OK();
 }
 #endif
 
@@ -181,10 +172,11 @@ static inline Status FileOpenReadable(const std::string& filename, int* fd) {
   int ret;
   errno_t errno_actual = 0;
 #if defined(_MSC_VER)
-  std::wstring wFilename;
-  RETURN_NOT_OK(Utf8ToUtf16(filename, wFilename));
+  std::wstring wide_filename;
+  RETURN_NOT_OK(ConvertToUtf16(filename, &wide_filename));
 
-  errno_actual = _wsopen_s(fd, wFilename.c_str(), _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD);
+  errno_actual =
+      _wsopen_s(fd, wide_filename.c_str(), _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD);
   ret = *fd;
 #else
   ret = *fd = open(filename.c_str(), O_RDONLY | O_BINARY);
@@ -200,8 +192,8 @@ static inline Status FileOpenWriteable(
   errno_t errno_actual = 0;
 
 #if defined(_MSC_VER)
-  std::wstring wFilename;
-  RETURN_NOT_OK(Utf8ToUtf16(filename, wFilename));
+  std::wstring wide_filename;
+  RETURN_NOT_OK(ConvertToUtf16(filename, &wide_filename));
 
   int oflag = _O_CREAT | _O_BINARY;
   int pmode = _S_IWRITE;
@@ -215,7 +207,7 @@ static inline Status FileOpenWriteable(
     oflag |= _O_RDWR;
   }
 
-  errno_actual = _wsopen_s(fd, wFilename.c_str(), oflag, _SH_DENYNO, pmode);
+  errno_actual = _wsopen_s(fd, wide_filename.c_str(), oflag, _SH_DENYNO, pmode);
   ret = *fd;
 
 #else

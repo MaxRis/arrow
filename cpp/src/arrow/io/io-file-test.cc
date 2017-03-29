@@ -42,32 +42,27 @@ static bool FileExists(const std::string& path) {
 }
 
 #if defined(_MSC_VER)
-void customInvalidParameterHandler(const wchar_t* expression,
-	const wchar_t* function,
-	const wchar_t* file,
-	unsigned int line,
-	uintptr_t pReserved)
-{
-	wprintf(L"Invalid parameter detected in function %s."
-		L" File: %s Line: %d\n", function, file, line);
-	wprintf(L"Expression: %s\n", expression);
+void InvalidParamHandler(const wchar_t* expr, const wchar_t* func,
+    const wchar_t* source_file, unsigned int source_line, uintptr_t reserved) {
+  wprintf(L"Invalid parameter in funcion %s. Source: %s line %d expression %s", func,
+      source_file, source_line, expr);
 }
 #endif
 
 static bool FileIsClosed(int fd) {
 #if defined(_MSC_VER)
-    // Disables default behavior on wrong params which causes the application to crash
-    // https://msdn.microsoft.com/en-us/library/ksazx244.aspx
-    _set_invalid_parameter_handler(customInvalidParameterHandler);
+  // Disables default behavior on wrong params which causes the application to crash
+  // https://msdn.microsoft.com/en-us/library/ksazx244.aspx
+  _set_invalid_parameter_handler(InvalidParamHandler);
 
-    // Disable the message box for assertions.
-    _CrtSetReportMode(_CRT_ASSERT, 0);
+  // Disables possible assertion alert box on invalid input arguments
+  _CrtSetReportMode(_CRT_ASSERT, 0);
 
-    int ret = static_cast<int>(_close(fd));
-    return (ret == -1);
+  int ret = static_cast<int>(_close(fd));
+  return (ret == -1);
 #else
-    if (-1 != fcntl(fd, F_GETFD)) { return false; }
-    return errno == EBADF;
+  if (-1 != fcntl(fd, F_GETFD)) { return false; }
+  return errno == EBADF;
 #endif
 }
 

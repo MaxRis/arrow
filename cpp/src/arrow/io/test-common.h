@@ -69,7 +69,7 @@ class MemoryMapFixture {
 
   void CreateFile(const std::string path, int64_t size) {
     FILE* file = fopen(path.c_str(), "w");
-	if (file != nullptr) {
+    if (file != nullptr) {
       tmp_files_.push_back(path);
 #ifdef _MSC_VER
       _chsize(fileno(file), static_cast<size_t>(size));
@@ -77,7 +77,7 @@ class MemoryMapFixture {
       ftruncate(fileno(file), static_cast<size_t>(size));
 #endif
       fclose(file);
-	}
+    }
   }
 
   Status InitMemoryMap(
