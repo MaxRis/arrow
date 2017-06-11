@@ -96,6 +96,25 @@ class TestFileOutputStream : public FileTestFixture {
   std::shared_ptr<FileOutputStream> file_;
 };
 
+#if defined(_MSC_VER)
+#pragma warning(push )
+// Disable code page incompatibility warning
+#pragma warning(disable : 4566)
+TEST_F(TestFileOutputStream, FileNameWideCharConversionRangeException) {
+  std::shared_ptr<FileOutputStream> file;
+  std::string file_name = "\101\101\101";
+  printf("Filename: %s", file_name.c_str());
+  // Break file name literal string encoding by setting character as UTF-8
+  file_name[0] = '\u0456';
+  printf("Filename: %s", file_name.c_str());
+  ASSERT_RAISES(Invalid, FileOutputStream::Open(file_name, &file));
+
+  std::shared_ptr<ReadableFile> rd_file;
+  ASSERT_RAISES(Invalid, ReadableFile::Open(file_name, &rd_file));
+}
+#pragma warning(pop) 
+#endif
+
 TEST_F(TestFileOutputStream, DestructorClosesFile) {
   int fd;
   {
