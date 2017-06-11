@@ -102,7 +102,7 @@ class TestFileOutputStream : public FileTestFixture {
 #pragma warning(disable : 4566)
 TEST_F(TestFileOutputStream, FileNameWideCharConversionRangeException) {
   std::shared_ptr<FileOutputStream> file;
-  std::string file_name = "\101\101\101";
+  std::string file_name = "\101\102\103";
   printf("Filename: %s", file_name.c_str());
   // Break file name literal string encoding by setting character as UTF-8
   file_name[0] = '\u0456';
