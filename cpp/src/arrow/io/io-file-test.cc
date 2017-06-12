@@ -33,6 +33,7 @@
 #include "arrow/io/file.h"
 #include "arrow/io/test-common.h"
 #include "arrow/memory_pool.h"
+#include <codecvt>
 
 namespace arrow {
 namespace io {
@@ -102,7 +103,17 @@ class TestFileOutputStream : public FileTestFixture {
 #pragma warning(disable : 4566)
 TEST_F(TestFileOutputStream, FileNameWideCharConversionRangeException) {
   std::shared_ptr<FileOutputStream> file;
-  std::string file_name = "\101\U00000041\u0456";
+  //const char32_t* raw_utf32 = U" = \U0001F60E is B-)";
+  //std::u32string str6{ U"test" };
+  //std::string file_name = "\101\U00000041\u0456";
+  //std::string file_name = (const char*)raw_utf32;
+  //std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+  //std::wstring unicodeString = converter.from_bytes("\101\U00000041\u0456");
+  //std::string file_name = (const char*)unicodeString.c_str();
+  //std::string file_name = (const char*)L"\u2611\u0456\101";
+  std::string file_name = "TestString";
+  file_name[1] = '\u0456';
+  file_name[3] = '\101';
   printf("Filename: %s", file_name.c_str());
   // Break file name literal string encoding by setting character as UTF-8
   //file_name[0] = '\u0456';
