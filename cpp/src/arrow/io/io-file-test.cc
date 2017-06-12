@@ -33,7 +33,6 @@
 #include "arrow/io/file.h"
 #include "arrow/io/test-common.h"
 #include "arrow/memory_pool.h"
-#include <codecvt>
 
 namespace arrow {
 namespace io {
@@ -98,18 +97,14 @@ class TestFileOutputStream : public FileTestFixture {
 };
 
 #if defined(_MSC_VER)
-#pragma warning(push )
-// Disable code page incompatibility warning
-#pragma warning(disable : 4566)
 TEST_F(TestFileOutputStream, FileNameWideCharConversionRangeException) {
   std::shared_ptr<FileOutputStream> file;
-  std::string file_name = (char*)U"\xe4\xb8\xad";
+  std::string file_name = "\x80";
   ASSERT_RAISES(Invalid, FileOutputStream::Open(file_name, &file));
 
   std::shared_ptr<ReadableFile> rd_file;
   ASSERT_RAISES(Invalid, ReadableFile::Open(file_name, &rd_file));
 }
-#pragma warning(pop) 
 #endif
 
 TEST_F(TestFileOutputStream, DestructorClosesFile) {
