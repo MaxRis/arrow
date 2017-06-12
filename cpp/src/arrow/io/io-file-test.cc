@@ -103,26 +103,11 @@ class TestFileOutputStream : public FileTestFixture {
 #pragma warning(disable : 4566)
 TEST_F(TestFileOutputStream, FileNameWideCharConversionRangeException) {
   std::shared_ptr<FileOutputStream> file;
-  //const char32_t* raw_utf32 = U" = \U0001F60E is B-)";
-  //std::u32string str6{ U"test" };
-  //std::string file_name = "\101\U00000041\u0456";
-  //std::string file_name = (const char*)raw_utf32;
-  //std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
-  //std::wstring unicodeString = converter.from_bytes("\101\U00000041\u0456");
-  //std::string file_name = (const char*)unicodeString.c_str();
-  //std::string file_name = (const char*)L"\u2611\u0456\101";
   std::string file_name = (char*)U"\xe4\xb8\xad";
-  //file_name[0] = u8"\xd800";
-  //file_name[3] = '\101';
-  printf("Filename: %s", file_name.c_str());
-  std::string buffer = (char*)file_name.c_str();
-  // Break file name literal string encoding by setting character as UTF-8
-  //file_name[0] = '\u0456';
-  //printf("Filename: %s", file_name.c_str());
-  ASSERT_RAISES(Invalid, FileOutputStream::Open(buffer, &file));
+  ASSERT_RAISES(Invalid, FileOutputStream::Open(file_name, &file));
 
   std::shared_ptr<ReadableFile> rd_file;
-  ASSERT_RAISES(Invalid, ReadableFile::Open(buffer, &rd_file));
+  ASSERT_RAISES(Invalid, ReadableFile::Open(file_name, &rd_file));
 }
 #pragma warning(pop) 
 #endif
