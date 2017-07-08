@@ -20,6 +20,10 @@ os: Visual Studio 2015
 
 environment:
   matrix:
+    - GENERATOR: NMake Makefiles
+      PYTHON: "3.5"
+      ARCH: "64"
+      CONFIGURATION: "Release"
     - GENERATOR: Visual Studio 14 2015 Win64
       PYTHON: "3.5"
       ARCH: "64"
