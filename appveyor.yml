@@ -27,6 +27,10 @@ environment:
     - GENERATOR: Visual Studio 14 2015 Win64
       PYTHON: "3.5"
       ARCH: "64"
+      CONFIGURATION: "Debug"
+    - GENERATOR: Visual Studio 14 2015 Win64
+      PYTHON: "3.5"
+      ARCH: "64"
       CONFIGURATION: "Toolchain"
 
   MSVC_DEFAULT_OPTIONS: ON

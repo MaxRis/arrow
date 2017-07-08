@@ -17,67 +17,82 @@
 
 @echo on
 
-conda update --yes --quiet conda
+if "%CONFIGURATION%" == "Debug" (
+  mkdir cpp\build-debug
+  pushd cpp\build-debug
 
-conda create -n arrow -q -y python=%PYTHON% ^
-      six pytest setuptools numpy pandas cython
-
-if "%CONFIGURATION%" == "Toolchain" (
-  conda install -n arrow -q -y -c conda-forge ^
-        flatbuffers rapidjson ^
-        cmake git boost-cpp thrift-cpp snappy zlib brotli gflags
+  cmake -G "%GENERATOR%" ^
+        -DARROW_BOOST_USE_SHARED=OFF ^
+        -DCMAKE_BUILD_TYPE=Debug ^
+        -DARROW_CXXFLAGS="/MP" ^
+        ..  || exit /B
+  popd
 )
 
-call activate arrow
+if NOT "%CONFIGURATION%" == "Debug" (
 
-if "%CONFIGURATION%" == "Toolchain" (
-  set ARROW_BUILD_TOOLCHAIN=%CONDA_PREFIX%\Library
-)
+      conda update --yes --quiet conda
 
-set ARROW_HOME=%CONDA_PREFIX%\Library
+      conda create -n arrow -q -y python=%PYTHON% ^
+            six pytest setuptools numpy pandas cython
 
-@rem Build and test Arrow C++ libraries
+      if "%CONFIGURATION%" == "Toolchain" (
+      conda install -n arrow -q -y -c conda-forge ^
+            flatbuffers rapidjson ^
+            cmake git boost-cpp thrift-cpp snappy zlib brotli gflags
+      )
 
-mkdir cpp\build
-pushd cpp\build
+      call activate arrow
 
-cmake -G "%GENERATOR%" ^
-      -DCMAKE_INSTALL_PREFIX=%CONDA_PREFIX%\Library ^
-      -DARROW_BOOST_USE_SHARED=OFF ^
+      if "%CONFIGURATION%" == "Toolchain" (
+      set ARROW_BUILD_TOOLCHAIN=%CONDA_PREFIX%\Library
+      )
+
+      set ARROW_HOME=%CONDA_PREFIX%\Library
+
+      @rem Build and test Arrow C++ libraries
+
+      mkdir cpp\build
+      pushd cpp\build
+
+      cmake -G "%GENERATOR%" ^
+            -DCMAKE_INSTALL_PREFIX=%CONDA_PREFIX%\Library ^
+            -DARROW_BOOST_USE_SHARED=OFF ^
+            -DCMAKE_BUILD_TYPE=Release ^
+            -DARROW_CXXFLAGS="/WX /MP" ^
+            -DARROW_PYTHON=ON ^
+            ..  || exit /B
+      cmake --build . --target INSTALL --config Release  || exit /B
+
+      @rem Needed so python-test.exe works
+      set PYTHONPATH=%CONDA_PREFIX%\Lib;%CONDA_PREFIX%\Lib\site-packages;%CONDA_PREFIX%\python35.zip;%CONDA_PREFIX%\DLLs;%CONDA_PREFIX%;%PYTHONPATH%
+
+      ctest -VV  || exit /B
+      popd
+
+      @rem Build parquet-cpp
+
+      git clone https://github.com/apache/parquet-cpp.git || exit /B
+      mkdir parquet-cpp\build
+      pushd parquet-cpp\build
+
+      set PARQUET_BUILD_TOOLCHAIN=%CONDA_PREFIX%\Library
+      set PARQUET_HOME=%CONDA_PREFIX%\Library
+      cmake -G "%GENERATOR%" ^
+      -DCMAKE_INSTALL_PREFIX=%PARQUET_HOME% ^
       -DCMAKE_BUILD_TYPE=Release ^
-      -DARROW_CXXFLAGS="/WX /MP" ^
-      -DARROW_PYTHON=ON ^
-      ..  || exit /B
-cmake --build . --target INSTALL --config Release  || exit /B
+      -DPARQUET_BOOST_USE_SHARED=OFF ^
+      -DPARQUET_ZLIB_VENDORED=off ^
+      -DPARQUET_BUILD_TESTS=off .. || exit /B
+      cmake --build . --target INSTALL --config Release || exit /B
+      popd
 
-@rem Needed so python-test.exe works
-set PYTHONPATH=%CONDA_PREFIX%\Lib;%CONDA_PREFIX%\Lib\site-packages;%CONDA_PREFIX%\python35.zip;%CONDA_PREFIX%\DLLs;%CONDA_PREFIX%;%PYTHONPATH%
+      @rem Build and import pyarrow
+      @rem parquet-cpp has some additional runtime dependencies that we need to figure out
+      @rem see PARQUET-1018
 
-ctest -VV  || exit /B
-popd
-
-@rem Build parquet-cpp
-
-git clone https://github.com/apache/parquet-cpp.git || exit /B
-mkdir parquet-cpp\build
-pushd parquet-cpp\build
-
-set PARQUET_BUILD_TOOLCHAIN=%CONDA_PREFIX%\Library
-set PARQUET_HOME=%CONDA_PREFIX%\Library
-cmake -G "%GENERATOR%" ^
-     -DCMAKE_INSTALL_PREFIX=%PARQUET_HOME% ^
-     -DCMAKE_BUILD_TYPE=Release ^
-     -DPARQUET_BOOST_USE_SHARED=OFF ^
-     -DPARQUET_ZLIB_VENDORED=off ^
-     -DPARQUET_BUILD_TESTS=off .. || exit /B
-cmake --build . --target INSTALL --config Release || exit /B
-popd
-
-@rem Build and import pyarrow
-@rem parquet-cpp has some additional runtime dependencies that we need to figure out
-@rem see PARQUET-1018
-
-pushd python
-python setup.py build_ext --inplace --with-parquet --bundle-arrow-cpp bdist_wheel  || exit /B
-py.test pyarrow -v -s --parquet || exit /B
-popd
+      pushd python
+      python setup.py build_ext --inplace --with-parquet --bundle-arrow-cpp bdist_wheel  || exit /B
+      py.test pyarrow -v -s --parquet || exit /B
+      popd
+)
