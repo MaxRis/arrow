@@ -26,6 +26,8 @@ if "%CONFIGURATION%" == "Debug" (
         -DCMAKE_BUILD_TYPE=Debug ^
         -DARROW_CXXFLAGS="/MP" ^
         ..  || exit /B
+
+  cmake --build . --config Debug || exit /B
   popd
 )
 
