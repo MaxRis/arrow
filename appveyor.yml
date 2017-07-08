@@ -23,11 +23,11 @@ environment:
     - GENERATOR: Visual Studio 14 2015 Win64
       PYTHON: "3.5"
       ARCH: "64"
-      CONFIGURATION: "Release"
+      CONFIGURATION: "Debug"
     - GENERATOR: Visual Studio 14 2015 Win64
       PYTHON: "3.5"
       ARCH: "64"
-      CONFIGURATION: "Debug"
+      CONFIGURATION: "Release"
     - GENERATOR: Visual Studio 14 2015 Win64
       PYTHON: "3.5"
       ARCH: "64"
