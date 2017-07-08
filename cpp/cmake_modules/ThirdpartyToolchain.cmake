@@ -35,7 +35,12 @@ string(TOUPPER ${CMAKE_BUILD_TYPE} UPPERCASE_BUILD_TYPE)
 set(EP_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_${UPPERCASE_BUILD_TYPE}}")
 set(EP_C_FLAGS "${CMAKE_C_FLAGS} ${CMAKE_C_FLAGS_${UPPERCASE_BUILD_TYPE}}")
 
-if (NOT MSVC)
+if (MSVC)
+  message(STATUS "EP_CXX_FLAGS: ${EP_CXX_FLAGS}")
+  message(STATUS "EP_C_FLAGS: ${EP_C_FLAGS}")
+
+  # string(REPLACE "-Wall" "" CUSTOM_FLAGS ${CMAKE_CXX_FLAGS})
+else()
   # Set -fPIC on all external projects
   set(EP_CXX_FLAGS "${EP_CXX_FLAGS} -fPIC")
   set(EP_C_FLAGS "${EP_C_FLAGS} -fPIC")
@@ -346,10 +351,15 @@ if (ARROW_IPC)
   ## Flatbuffers
   if("${FLATBUFFERS_HOME}" STREQUAL "")
     set(FLATBUFFERS_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/flatbuffers_ep-prefix/src/flatbuffers_ep-install")
+    if (MSVC)
+      set(FLATBUFFERS_CMAKE_CXX_FLAGS /EHsc)
+    else()
+      set(FLATBUFFERS_CMAKE_CXX_FLAGS -fPIC)
+    endif()
     ExternalProject_Add(flatbuffers_ep
       URL "https://github.com/google/flatbuffers/archive/v${FLATBUFFERS_VERSION}.tar.gz"
       CMAKE_ARGS
-      "-DCMAKE_CXX_FLAGS=-fPIC"
+      "-DCMAKE_CXX_FLAGS=${FLATBUFFERS_CMAKE_CXX_FLAGS}"
       "-DCMAKE_INSTALL_PREFIX:PATH=${FLATBUFFERS_PREFIX}"
       "-DFLATBUFFERS_BUILD_TESTS=OFF")
 
