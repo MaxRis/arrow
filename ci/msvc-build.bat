@@ -17,26 +17,24 @@
 
 @echo on
 
-echo %CONDA_PREFIX%
-set ARROW_HOME=%CONDA_PREFIX%\Library
-
 conda update --yes --quiet conda
-echo %CONDA_PREFIX%
 
 conda create -n arrow -q -y python=%PYTHON% ^
       six pytest setuptools numpy pandas cython
-echo %CONDA_PREFIX%
 
 if "%CONFIGURATION%" == "Toolchain" (
   conda install -n arrow -q -y -c conda-forge ^
         flatbuffers rapidjson ^
         cmake git boost-cpp thrift-cpp snappy zlib brotli gflags
-
-  set ARROW_BUILD_TOOLCHAIN=%CONDA_PREFIX%\Library
 )
 
 call activate arrow
-echo %CONDA_PREFIX%
+
+if "%CONFIGURATION%" == "Toolchain" (
+  set ARROW_BUILD_TOOLCHAIN=%CONDA_PREFIX%\Library
+)
+
+set ARROW_HOME=%CONDA_PREFIX%\Library
 
 @rem Build and test Arrow C++ libraries
 
