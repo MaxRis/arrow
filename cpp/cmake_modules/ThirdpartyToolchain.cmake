@@ -562,8 +562,7 @@ endif()
 # ----------------------------------------------------------------------
 # Brotli
 
-find_package(Brotli)
-if (NOT BROTLI_FOUND)
+if("${BROTLI_HOME}" STREQUAL "")
   set(BROTLI_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/brotli_ep/src/brotli_ep-install")
   set(BROTLI_HOME "${BROTLI_PREFIX}")
   set(BROTLI_INCLUDE_DIR "${BROTLI_PREFIX}/include")
@@ -598,6 +597,7 @@ if (NOT BROTLI_FOUND)
   endif()
   set(BROTLI_VENDORED 1)
 else()
+  find_package(Brotli REQUIRED)
   set(BROTLI_VENDORED 0)
 endif()
 
@@ -619,8 +619,7 @@ if (ARROW_WITH_LZ4)
 # ----------------------------------------------------------------------
 # Lz4
 
-  find_package(Lz4)
-  if (NOT LZ4_FOUND)
+  if("$ENV{LZ4_HOME}" STREQUAL "")
     set(LZ4_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}/lz4_ep-prefix/src/lz4_ep")
     set(LZ4_INCLUDE_DIR "${LZ4_BUILD_DIR}/lib")
   
@@ -645,6 +644,7 @@ if (ARROW_WITH_LZ4)
   
     set(LZ4_VENDORED 1)
   else()
+    find_package(Lz4 REQUIRED)
     set(LZ4_VENDORED 0)
   endif()
   
@@ -661,8 +661,7 @@ if (ARROW_WITH_ZSTD)
 # ----------------------------------------------------------------------
 # ZSTD
 
-  find_package(ZSTD)
-  if (NOT ZSTD_FOUND)
+  if("$ENV{ZSTD_HOME}" STREQUAL "")
     set(ZSTD_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}/zstd_ep-prefix/src/zstd_ep")
     set(ZSTD_INCLUDE_DIR "${ZSTD_BUILD_DIR}/lib")
 
@@ -687,6 +686,7 @@ if (ARROW_WITH_ZSTD)
 
     set(ZSTD_VENDORED 1)
   else()
+    find_package(ZSTD REQUIRED)
     set(ZSTD_VENDORED 0)
   endif()
 
