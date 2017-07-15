@@ -497,8 +497,7 @@ endif()
 # Snappy
 
 ## Snappy
-find_package(Snappy)
-if (NOT SNAPPY_FOUND)
+if("${SNAPPY_HOME}" STREQUAL "")
   set(SNAPPY_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/snappy_ep/src/snappy_ep-install")
   set(SNAPPY_HOME "${SNAPPY_PREFIX}")
   set(SNAPPY_INCLUDE_DIR "${SNAPPY_PREFIX}/include")
@@ -548,6 +547,7 @@ if (NOT SNAPPY_FOUND)
   endif()
   set(SNAPPY_VENDORED 1)
 else()
+  find_package(Snappy REQUIRED)
   set(SNAPPY_VENDORED 0)
 endif()
 
