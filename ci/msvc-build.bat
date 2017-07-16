@@ -96,7 +96,7 @@ if "%JOB%" == "Cmake_Script_Tests" (
         -DARROW_CXXFLAGS="/MP" ^
         .. >nul 2>error.txt
 
-  FINDSTR /M /C:"No static or shared librarya provided for lz4_static" error.txt || exit /B
+  FINDSTR /M /C:"No static or shared library provided for lz4_static" error.txt || exit /B
   set LZ4_HOME=
 
   echo Test cmake script errors out on zstd missed
