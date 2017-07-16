@@ -27,7 +27,7 @@ if "%JOB%" == "Cmake_Script_Tests" (
   mkdir cpp\build-cmake-test
   pushd cpp\build-cmake-test
 
-  echo "Test cmake script errors out on flatbuffers missed"
+  echo Test cmake script errors out on flatbuffers missed
   set FLATBUFFERS_HOME=WrongPath
 
   cmake -G "%GENERATOR%" ^
@@ -39,7 +39,7 @@ if "%JOB%" == "Cmake_Script_Tests" (
   FINDSTR /M /C:"Could not find the Flatbuffers library" error.txt || exit /B
   set FLATBUFFERS_HOME=
 
-  echo "Test cmake script errors out on gflags missed"
+  echo Test cmake script errors out on gflags missed
   set GFLAGS_HOME=WrongPath
 
   cmake -G "%GENERATOR%" ^
@@ -51,7 +51,7 @@ if "%JOB%" == "Cmake_Script_Tests" (
   FINDSTR /M /C:"No static or shared library provided for gflags" error.txt || exit /B
   set GFLAGS_HOME=
 
-  echo "Test cmake script errors out on snappy missed"
+  echo Test cmake script errors out on snappy missed
   set SNAPPY_HOME=WrongPath
 
   cmake -G "%GENERATOR%" ^
@@ -63,7 +63,7 @@ if "%JOB%" == "Cmake_Script_Tests" (
   FINDSTR /M /C:"Could not find the Snappy library" error.txt || exit /B
   set SNAPPY_HOME=
 
-  echo "Test cmake script errors out on zlib missed"
+  echo Test cmake script errors out on zlib missed
   set ZLIB_HOME=WrongPath
 
   cmake -G "%GENERATOR%" ^
@@ -75,7 +75,7 @@ if "%JOB%" == "Cmake_Script_Tests" (
   FINDSTR /M /C:"Could not find the ZLIB library" error.txt || exit /B
   set ZLIB_HOME=
 
-  echo "Test cmake script errors out on brotli missed"
+  echo Test cmake script errors out on brotli missed
   set BROTLI_HOME=WrongPath
 
   cmake -G "%GENERATOR%" ^
@@ -87,7 +87,7 @@ if "%JOB%" == "Cmake_Script_Tests" (
   FINDSTR /M /C:"Could not find the Brotli library" error.txt || exit /B
   set BROTLI_HOME=
 
-  echo "Test cmake script errors out on lz4 missed"
+  echo Test cmake script errors out on lz4 missed
   set LZ4_HOME=WrongPath
 
   cmake -G "%GENERATOR%" ^
@@ -96,10 +96,10 @@ if "%JOB%" == "Cmake_Script_Tests" (
         -DARROW_CXXFLAGS="/MP" ^
         .. >nul 2>error.txt
 
-  FINDSTR /M /C:"No static or shared library provided for lz4_static" error.txt || exit /B
+  FINDSTR /M /C:"No static or shared librarya provided for lz4_static" error.txt || exit /B
   set LZ4_HOME=
 
-  echo "Test cmake script errors out on zstd missed"
+  echo Test cmake script errors out on zstd missed
   set ZSTD_HOME=WrongPath
 
   cmake -G "%GENERATOR%" ^
