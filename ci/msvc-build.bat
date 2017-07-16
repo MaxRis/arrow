@@ -30,7 +30,7 @@ if "%JOB%" == "Cmake_Script_Tests" (
         -DARROW_BOOST_USE_SHARED=OFF ^
         -DCMAKE_BUILD_TYPE=%CONFIGURATION% ^
         -DARROW_CXXFLAGS="/MP" ^
-        .. 2>error.txt
+        ..
 
   FINDSTR /M /C:"Could not find the ZLIB library" error.txt || exit /B
 
