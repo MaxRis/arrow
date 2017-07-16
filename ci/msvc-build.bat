@@ -19,8 +19,8 @@
 
 if "%JOB%" == "Cmake_Script_Tests" (
   conda update --yes --quiet conda
-  conda create -n arrow-cmake-script-tests
-  conda install -n arrow-cmake-script-tests ^
+  conda create -n arrow-cmake-script-tests -q -y
+  conda install -n arrow-cmake-script-tests -q -y -c conda-forge ^
       cmake git boost-cpp
   call activate arrow-cmake-script-tests
 
@@ -33,6 +33,9 @@ if "%JOB%" == "Cmake_Script_Tests" (
         .. >nul 2>error.txt
 
   FINDSTR /M /C:"Could not find the ZLIB library" error.txt || exit /B
+
+  @rem Finish build job successfully
+  exit /B 0
 )
 
 if "%CONFIGURATION%" == "Debug" (
