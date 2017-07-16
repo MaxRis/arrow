@@ -619,7 +619,7 @@ if (ARROW_WITH_LZ4)
 # ----------------------------------------------------------------------
 # Lz4
 
-  if("$ENV{LZ4_HOME}" STREQUAL "")
+  if("${LZ4_HOME}" STREQUAL "")
     set(LZ4_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}/lz4_ep-prefix/src/lz4_ep")
     set(LZ4_INCLUDE_DIR "${LZ4_BUILD_DIR}/lib")
   
@@ -661,7 +661,7 @@ if (ARROW_WITH_ZSTD)
 # ----------------------------------------------------------------------
 # ZSTD
 
-  if("$ENV{ZSTD_HOME}" STREQUAL "")
+  if("${ZSTD_HOME}" STREQUAL "")
     set(ZSTD_BUILD_DIR "${CMAKE_CURRENT_BINARY_DIR}/zstd_ep-prefix/src/zstd_ep")
     set(ZSTD_INCLUDE_DIR "${ZSTD_BUILD_DIR}/lib")
 
