@@ -27,6 +27,31 @@ if "%JOB%" == "Cmake_Script_Tests" (
   mkdir cpp\build-cmake-test
   pushd cpp\build-cmake-test
 
+  @rem Test cmake script errors out on flatbuffers missed
+  set FLATBUFFERS_HOME=WrongPath
+
+  cmake -G "%GENERATOR%" ^
+        -DARROW_BOOST_USE_SHARED=OFF ^
+        -DCMAKE_BUILD_TYPE=%CONFIGURATION% ^
+        -DARROW_CXXFLAGS="/MP" ^
+        .. >nul 2>error.txt
+
+  FINDSTR /M /C:"Could not find the Flatbuffers library" error.txt || exit /B
+  set FLATBUFFERS_HOME=
+
+  @rem Test cmake script errors out on gflags missed
+  set GFLAGS_HOME=WrongPath
+
+  cmake -G "%GENERATOR%" ^
+        -DARROW_BOOST_USE_SHARED=OFF ^
+        -DCMAKE_BUILD_TYPE=%CONFIGURATION% ^
+        -DARROW_CXXFLAGS="/MP" ^
+        .. >nul 2>error.txt
+
+  FINDSTR /M /C:"No static or shared library provided for gflags" error.txt || exit /B
+  set GFLAGS_HOME=
+
+  @rem Test cmake script errors out on zlib missed
   set ZLIB_HOME=WrongPath
 
   cmake -G "%GENERATOR%" ^
@@ -36,6 +61,7 @@ if "%JOB%" == "Cmake_Script_Tests" (
         .. >nul 2>error.txt
 
   FINDSTR /M /C:"Could not find the ZLIB library" error.txt || exit /B
+  set ZLIB_HOME=
 
   popd
 
