@@ -17,6 +17,24 @@
 
 @echo on
 
+if "%JOB%" == "Cmake_Script_Tests" (
+  conda update --yes --quiet conda
+  conda create -n arrow-cmake-script-tests
+  conda install -n arrow-cmake-script-tests ^
+      cmake git boost-cpp
+  call activate arrow-cmake-script-tests
+
+  set ZLIB_HOME=WrongPath
+
+  cmake -G "%GENERATOR%" ^
+        -DARROW_BOOST_USE_SHARED=OFF ^
+        -DCMAKE_BUILD_TYPE=%CONFIGURATION% ^
+        -DARROW_CXXFLAGS="/MP" ^
+        .. >nul 2>error.txt
+
+  FINDSTR /M /C:"Could not find the ZLIB library" error.txt || exit /B
+)
+
 if "%CONFIGURATION%" == "Debug" (
   mkdir cpp\build-debug
   pushd cpp\build-debug
