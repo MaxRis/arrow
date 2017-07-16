@@ -17,113 +17,13 @@
 
 @echo on
 
-if "%JOB%" == "Cmake_Script_Tests" (
-  conda update --yes --quiet conda
-  conda create -n arrow-cmake-script-tests -q -y
-  conda install -n arrow-cmake-script-tests -q -y -c conda-forge ^
-      cmake git boost-cpp
-  call activate arrow-cmake-script-tests
-
-  mkdir cpp\build-cmake-test
-  pushd cpp\build-cmake-test
-
-  echo Test cmake script errors out on flatbuffers missed
-  set FLATBUFFERS_HOME=WrongPath
-
-  cmake -G "%GENERATOR%" ^
-        -DARROW_BOOST_USE_SHARED=OFF ^
-        -DCMAKE_BUILD_TYPE=%CONFIGURATION% ^
-        -DARROW_CXXFLAGS="/MP" ^
-        .. >nul 2>error.txt
-
-  FINDSTR /M /C:"Could not find the Flatbuffers library" error.txt || exit /B
-  set FLATBUFFERS_HOME=
-
-  echo Test cmake script errors out on gflags missed
-  set GFLAGS_HOME=WrongPath
-
-  cmake -G "%GENERATOR%" ^
-        -DARROW_BOOST_USE_SHARED=OFF ^
-        -DCMAKE_BUILD_TYPE=%CONFIGURATION% ^
-        -DARROW_CXXFLAGS="/MP" ^
-        .. >nul 2>error.txt
-
-  FINDSTR /M /C:"No static or shared library provided for gflags" error.txt || exit /B
-  set GFLAGS_HOME=
-
-  echo Test cmake script errors out on snappy missed
-  set SNAPPY_HOME=WrongPath
-
-  cmake -G "%GENERATOR%" ^
-        -DARROW_BOOST_USE_SHARED=OFF ^
-        -DCMAKE_BUILD_TYPE=%CONFIGURATION% ^
-        -DARROW_CXXFLAGS="/MP" ^
-        .. >nul 2>error.txt
-
-  FINDSTR /M /C:"Could not find the Snappy library" error.txt || exit /B
-  set SNAPPY_HOME=
-
-  echo Test cmake script errors out on zlib missed
-  set ZLIB_HOME=WrongPath
-
-  cmake -G "%GENERATOR%" ^
-        -DARROW_BOOST_USE_SHARED=OFF ^
-        -DCMAKE_BUILD_TYPE=%CONFIGURATION% ^
-        -DARROW_CXXFLAGS="/MP" ^
-        .. >nul 2>error.txt
-
-  FINDSTR /M /C:"Could not find the ZLIB library" error.txt || exit /B
-  set ZLIB_HOME=
-
-  echo Test cmake script errors out on brotli missed
-  set BROTLI_HOME=WrongPath
-
-  cmake -G "%GENERATOR%" ^
-        -DARROW_BOOST_USE_SHARED=OFF ^
-        -DCMAKE_BUILD_TYPE=%CONFIGURATION% ^
-        -DARROW_CXXFLAGS="/MP" ^
-        .. >nul 2>error.txt
-
-  FINDSTR /M /C:"Could not find the Brotli library" error.txt || exit /B
-  set BROTLI_HOME=
-
-  echo Test cmake script errors out on lz4 missed
-  set LZ4_HOME=WrongPath
-
-  cmake -G "%GENERATOR%" ^
-        -DARROW_BOOST_USE_SHARED=OFF ^
-        -DCMAKE_BUILD_TYPE=%CONFIGURATION% ^
-        -DARROW_CXXFLAGS="/MP" ^
-        .. >nul 2>error.txt
-
-  FINDSTR /M /C:"No static or shared library provided for lz4_static" error.txt || exit /B
-  set LZ4_HOME=
-
-  echo Test cmake script errors out on zstd missed
-  set ZSTD_HOME=WrongPath
-
-  cmake -G "%GENERATOR%" ^
-        -DARROW_BOOST_USE_SHARED=OFF ^
-        -DCMAKE_BUILD_TYPE=%CONFIGURATION% ^
-        -DARROW_CXXFLAGS="/MP" ^
-        .. >nul 2>error.txt
-
-  FINDSTR /M /C:"Could NOT find ZSTD" error.txt || exit /B
-  set ZSTD_HOME=
-
-  popd
-
-  @rem Finish build job successfully
-  exit /B 0
-)
-
-if "%CONFIGURATION%" == "Debug" (
+if "%JOB%" == "Build_Debug" (
   mkdir cpp\build-debug
   pushd cpp\build-debug
 
   cmake -G "%GENERATOR%" ^
         -DARROW_BOOST_USE_SHARED=OFF ^
-        -DCMAKE_BUILD_TYPE=Debug ^
+        -DCMAKE_BUILD_TYPE=%CONFIGURATION% ^
         -DARROW_CXXFLAGS="/MP" ^
         ..  || exit /B
 
@@ -139,7 +39,7 @@ conda update --yes --quiet conda
 conda create -n arrow -q -y python=%PYTHON% ^
       six pytest setuptools numpy pandas cython
 
-if "%CONFIGURATION%" == "Toolchain" (
+if "%JOB%" == "Toolchain" (
   conda install -n arrow -q -y -c conda-forge ^
       flatbuffers rapidjson cmake git boost-cpp ^
       thrift-cpp snappy zlib brotli gflags lz4-c zstd
@@ -147,7 +47,7 @@ if "%CONFIGURATION%" == "Toolchain" (
 
 call activate arrow
 
-if "%CONFIGURATION%" == "Toolchain" (
+if "%JOB%" == "Toolchain" (
   set ARROW_BUILD_TOOLCHAIN=%CONDA_PREFIX%\Library
 )
 
@@ -161,11 +61,11 @@ pushd cpp\build
 cmake -G "%GENERATOR%" ^
       -DCMAKE_INSTALL_PREFIX=%CONDA_PREFIX%\Library ^
       -DARROW_BOOST_USE_SHARED=OFF ^
-      -DCMAKE_BUILD_TYPE=Release ^
+      -DCMAKE_BUILD_TYPE=%CONFIGURATION% ^
       -DARROW_CXXFLAGS="/WX /MP" ^
       -DARROW_PYTHON=ON ^
       ..  || exit /B
-cmake --build . --target INSTALL --config Release  || exit /B
+cmake --build . --target INSTALL --config %CONFIGURATION%  || exit /B
 
 @rem Needed so python-test.exe works
 set PYTHONPATH=%CONDA_PREFIX%\Lib;%CONDA_PREFIX%\Lib\site-packages;%CONDA_PREFIX%\python35.zip;%CONDA_PREFIX%\DLLs;%CONDA_PREFIX%;%PYTHONPATH%
@@ -183,11 +83,11 @@ set PARQUET_BUILD_TOOLCHAIN=%CONDA_PREFIX%\Library
 set PARQUET_HOME=%CONDA_PREFIX%\Library
 cmake -G "%GENERATOR%" ^
      -DCMAKE_INSTALL_PREFIX=%PARQUET_HOME% ^
-     -DCMAKE_BUILD_TYPE=Release ^
+     -DCMAKE_BUILD_TYPE=%CONFIGURATION% ^
      -DPARQUET_BOOST_USE_SHARED=OFF ^
      -DPARQUET_ZLIB_VENDORED=off ^
      -DPARQUET_BUILD_TESTS=off .. || exit /B
-cmake --build . --target INSTALL --config Release || exit /B
+cmake --build . --target INSTALL --config %CONFIGURATION% || exit /B
 popd
 
 @rem Build and import pyarrow
