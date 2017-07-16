@@ -24,15 +24,20 @@ if "%JOB%" == "Cmake_Script_Tests" (
       cmake git boost-cpp
   call activate arrow-cmake-script-tests
 
+  mkdir cpp\build-cmake-test
+  pushd cpp\build-cmake-test
+
   set ZLIB_HOME=WrongPath
 
   cmake -G "%GENERATOR%" ^
         -DARROW_BOOST_USE_SHARED=OFF ^
         -DCMAKE_BUILD_TYPE=%CONFIGURATION% ^
         -DARROW_CXXFLAGS="/MP" ^
-        .. >error.txt
+        .. 2>error.txt
 
   FINDSTR /M /C:"Could not find the ZLIB library" error.txt || exit /B
+
+  popd
 
   @rem Finish build job successfully
   exit /B 0
