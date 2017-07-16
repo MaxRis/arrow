@@ -20,6 +20,11 @@ os: Visual Studio 2015
 
 environment:
   matrix:
+    - JOB: "Build"
+      GENERATOR: Visual Studio 15 2017 Win64
+      PYTHON: "3.5"
+      ARCH: "64"
+      CONFIGURATION: "Release"
     - JOB: "Cmake_Script_Tests"
       GENERATOR: NMake Makefiles
       PYTHON: "3.5"
