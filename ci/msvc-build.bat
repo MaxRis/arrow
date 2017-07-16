@@ -35,7 +35,7 @@ if "%JOB%" == "Cmake_Script_Tests" (
         -DARROW_CXXFLAGS="/MP" ^
         .. 2>error.txt
 
-  FINDSTR /M /C:"Could not find the ZLIB library" error.txt || exit /B
+  FINDSTR /M /C:"Could not find the ZLIBaa library" error.txt || exit /B
 
   popd
 
