@@ -25,6 +25,7 @@ environment:
       PYTHON: "3.5"
       ARCH: "64"
       CONFIGURATION: "Release"
+      APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2017
     - JOB: "Cmake_Script_Tests"
       GENERATOR: NMake Makefiles
       PYTHON: "3.5"
