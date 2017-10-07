@@ -17,7 +17,22 @@
 
 @echo on
 
+conda update --yes --quiet conda
+conda config --set auto_update_conda false
+conda info -a
+
+conda config --set show_channel_urls True
+
+# Help with SSL timeouts to S3
+conda config --set remote_connect_timeout_secs 12
+
+conda config --add channels https://repo.continuum.io/pkgs/free
+conda config --add channels conda-forge
+conda info -a
+
 if "%JOB%" == "Build_Debug" (
+  conda install -q -y yasm
+
   mkdir cpp\build-debug
   pushd cpp\build-debug
 
@@ -34,22 +49,9 @@ if "%JOB%" == "Build_Debug" (
   exit /B 0
 )
 
-conda update --yes --quiet conda
-conda config --set auto_update_conda false
-conda info -a
-
-conda config --set show_channel_urls True
-
-# Help with SSL timeouts to S3
-conda config --set remote_connect_timeout_secs 12
-
-conda config --add channels https://repo.continuum.io/pkgs/free
-conda config --add channels conda-forge
-conda info -a
-
 conda create -n arrow -q -y python=%PYTHON% ^
       six pytest setuptools numpy pandas cython ^
-      thrift-cpp
+      thrift-cpp yasm
 
 if "%JOB%" == "Toolchain" (
 
