@@ -34,7 +34,6 @@ addons:
     - gtk-doc-tools
     - autoconf-archive
     - libgirepository1.0-dev
-    - golang-go
 
 services:
   - docker
@@ -64,10 +63,6 @@ matrix:
     - $TRAVIS_BUILD_DIR/ci/travis_build_parquet_cpp.sh
     - $TRAVIS_BUILD_DIR/ci/travis_script_python.sh 2.7
     - $TRAVIS_BUILD_DIR/ci/travis_script_python.sh 3.6
-    addons:
-      apt:
-        packages:
-          - golang-go
   - compiler: clang
     language: cpp
     osx_image: xcode6.4
