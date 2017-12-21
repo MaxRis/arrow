@@ -59,6 +59,13 @@ if (MSVC)
 
   # Support large object code
   set(CXX_COMMON_FLAGS "${CXX_COMMON_FLAGS} /bigobj")
+
+  message(STATUS "MSVC_VERSION: ${MSVC_VERSION}")
+  # ARROW-1931 See https://github.com/google/googletest/issues/1318
+  if (MSVC_VERSION VERSION_GREATER 1900)
+    message(STATUS "!!!!! flag is set")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING")
+  endif()
 else()
   # Common flags set below with warning level
   set(CXX_COMMON_FLAGS "")
